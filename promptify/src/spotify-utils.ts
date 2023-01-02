@@ -1,5 +1,18 @@
 import axios from 'axios';
 import querystring from 'querystring'
+/// <reference types="spotify-api" />
+
+export interface PromptifySong {
+  name: string,
+  album_name: string,
+  album_external_url: string,
+  image: SpotifyApi.ImageObject,
+  artists: SpotifyApi.ArtistObjectSimplified[],
+  external_url: string,
+  duration_ms: number,
+  id: string;
+  uri: string;
+}
 
 interface SpotifyKeys {
 	accessToken: string,
@@ -75,7 +88,7 @@ const refreshToken = async () => {
     }
 
     // Use `/refresh_token` endpoint from our Node app
-    const { data } = await axios.get(`/refresh_token?refresh_token=${LOCALSTORAGE_VALUES.refreshToken}`);
+    const { data } = await axios.get(`api/refresh_token?refresh_token=${LOCALSTORAGE_VALUES.refreshToken}`);
 
     // Update localStorage values
     window.localStorage.setItem(LOCALSTORAGE_KEYS.accessToken, data.access_token);
@@ -158,3 +171,17 @@ export const search = async (query: string, type: string) => {
   });
 	return await axios.get(`${baseURL}/search/?${queryParams}`, { headers: headers })
 };
+
+export const formatSpotifySongToPromptifySong = (spotifySong: SpotifyApi.TrackObjectFull) : PromptifySong => {
+  return {
+    name: spotifySong.name,
+    album_name: spotifySong.album.name,
+    album_external_url: spotifySong.album.external_urls.spotify,
+    image: spotifySong.album.images[0],
+    artists: spotifySong.artists,
+    external_url: spotifySong.external_urls.spotify,
+    duration_ms: spotifySong.duration_ms,
+    id: spotifySong.id,
+    uri: spotifySong.uri
+  }
+}

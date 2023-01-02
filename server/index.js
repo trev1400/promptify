@@ -34,7 +34,7 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 app.post("/api/completion", async (req, res) => {
 	const completion = await openai.createCompletion({
 		model: "text-davinci-003",
-		prompt: req.body.prompt,
+		prompt: `list of ${req.body.prompt}`,
 		temperature: 0.8,
 		max_tokens: 256,
 		top_p: 1,
