@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from "react";
 import "./App.css";
-import axios from "axios";
-import { Button, Container, Text, Progress } from "@nextui-org/react";
-import { FiXCircle } from "react-icons/fi";
+import axios, { AxiosResponse } from "axios";
+import { Container } from "@nextui-org/react";
 import PromptifyNavbar from "./components/PromptifyNavbar";
-import ControlledTextArea from "./components/TypewriterTextarea";
+import PromptSection from "./components/PromptSection";
+import ResultsSections from "./components/ResultsSections";
 import {
 	accessToken,
 	search,
@@ -24,31 +24,50 @@ function App() {
 		setSpotifyToken(accessToken);
 	}, []);
 
+	const fetchCompletion = () => {
+		return axios.post(`${urlWithProxy}/completion`, {
+			prompt: prompt,
+		});
+	};
+
 	const fetchCompletions = async () => {
 		try {
 			setIsGenerating(true);
 			const uniqueCompletions = new Set<string>();
-			for (let i = 0; i < 3; i++) {
-				const completions = await axios.post(
-					`${urlWithProxy}/completion`,
-					{
-						prompt: prompt,
+			// Send 3 concurrent API requests to OpenAI to get a completion for the prompt
+			const completions = (await Promise.allSettled([
+				fetchCompletion(),
+				fetchCompletion(),
+			])) as {
+				status: "fulfilled" | "rejected";
+				value: AxiosResponse<any, any>;
+			}[];
+			// Filter out any rejected API requests
+			completions
+				.filter((completion) => completion.status === "fulfilled")
+				.map((completion) => {
+					// Check that Open AI returned results
+					if (completion.value.data.result.length > 0) {
+						// Result is an array of the items from the completion that was returned.
+						// This is usually in a line-separated text string, so we split out the new lines
+						const result: string[] =
+							completion.value.data.result[0].text.split("\n");
+						// Filter the result to exclude empty string values from array, then map to exclude
+						// duplicate completion items
+						result
+							.filter((song: string) => song !== "")
+							.map((song: string) => {
+								uniqueCompletions.add(
+									song
+										.replaceAll('"', "")
+										// Replaces digits and periods since OpenAI completion lists are numbered
+										.replace(/\d+\./gm, "")
+								);
+							});
 					}
-				);
-				// Check that Open AI returned results
-				if (completions.data.result.length > 0) {
-					const result: string[] =
-						completions.data.result[0].text.split("\n");
-					result
-						.filter((song: string) => song !== "")
-						.map((song: string) => {
-							uniqueCompletions.add(
-								song.replaceAll('"', "").replace(/\d+\./gm, "")
-							);
-						});
-				}
-			}
-			// We can safely cast array to PromptifySong[] becasue of our null check
+				});
+			console.log(uniqueCompletions);
+			// We can safely cast array to PromptifySong[] because of our null check
 			const promptifySongs: PromptifySong[] = (
 				await Promise.all(
 					Array.from(uniqueCompletions).map((song: string) => {
@@ -58,7 +77,12 @@ function App() {
 			).filter(
 				(promptifySong) => promptifySong !== null
 			) as PromptifySong[];
-			setSongs(promptifySongs);
+			// Filter out any dupes that the Spotify API returns
+			const songIds = promptifySongs.map((song) => song.id);
+			const uniquePromptifySongs: PromptifySong[] = promptifySongs.filter(
+				({ id }, index) => !songIds.includes(id, index + 1)
+			);
+			setSongs(uniquePromptifySongs);
 			setIsGenerating(false);
 		} catch (error) {
 			console.log(error);
@@ -69,6 +93,7 @@ function App() {
 		try {
 			const spotifyResponse = await search(songName, "track");
 			const spotifySongs = spotifyResponse.data.tracks.items;
+			console.log(songName, spotifySongs);
 			if (spotifySongs && spotifySongs.length > 0) {
 				return formatSpotifySongToPromptifySong(spotifySongs[0]);
 			}
@@ -92,88 +117,23 @@ function App() {
 			<Container
 				as="main"
 				css={{
-					position: "relative",
+					d: "flex",
+					fd: "column",
 					minWidth: "100%",
-					minHeight: "100vh",
+					minHeight: "calc(100vh - 76px)",
 					px: 0,
 					pb: "$20",
 					ox: "hidden",
 				}}
 			>
-				<Container
-					as="section"
-					css={{
-						d: "flex",
-						fd: "column",
-						fw: "nowrap",
-						ai: "center",
-						p: "$12 $20",
-						mw: "100%",
-						rowGap: "$4",
-					}}
-				>
-					<ControlledTextArea
-						prompts={[
-							"early 2010s rap songs to workout to",
-							"taylor swift's greatest hits",
-							"songs to listen to on a crisp autumn day",
-							"tropical house edm bangers for an afternoon by the pool",
-						]}
-						value={prompt}
-						onChange={handlePromptChange}
-						aria-label="Prompt"
-					/>
-					<Container
-						css={{
-							d: "flex",
-							fw: "nowrap",
-							ai: "center",
-							as: "flex-start",
-							gap: "$8",
-							p: 0,
-							m: 0,
-						}}
-					>
-						<Button
-							size="lg"
-							onPress={fetchCompletions}
-							disabled={prompt === "" || isGenerating}
-						>
-							Generate
-						</Button>
-						<Button
-							color="error"
-							size="lg"
-							iconRight={<FiXCircle size={20} />}
-							disabled={prompt === "" || isGenerating}
-							onPress={handlePromptClear}
-						>
-							Clear
-						</Button>
-					</Container>
-				</Container>
-				{isGenerating && (
-					<Container
-						as="section"
-						css={{
-							d: "flex",
-							fd: "column",
-							fw: "nowrap",
-							ai: "center",
-							p: "$12 $20",
-							mw: "100%",
-							gap: "$8",
-						}}
-					>
-						<Text h3>Promptifying, please be patient...</Text>
-						<Progress
-							indeterminated
-							color="primary"
-							status="primary"
-							css={{ maxWidth: "75%" }}
-						/>
-					</Container>
-				)}
+				<PromptSection
+					prompt={prompt}
+					isGenerating={isGenerating}
+					handlePromptChange={handlePromptChange}
+					handlePromptClear={handlePromptClear}
+					fetchCompletions={fetchCompletions}
+				/>
+				<ResultsSections isGenerating={isGenerating} songs={songs} />
 			</Container>
 		</div>
 	);

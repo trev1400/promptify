@@ -1,17 +1,19 @@
 import axios from 'axios';
 import querystring from 'querystring'
-/// <reference types="spotify-api" />
 
 export interface PromptifySong {
   name: string,
   album_name: string,
   album_external_url: string,
+  album_type: 'album' | 'single' | 'compilation',
   image: SpotifyApi.ImageObject,
   artists: SpotifyApi.ArtistObjectSimplified[],
+  release_date: string,
   external_url: string,
   duration_ms: number,
-  id: string;
-  uri: string;
+  id: string,
+  uri: string,
+  explicit: boolean,
 }
 
 interface SpotifyKeys {
@@ -177,11 +179,14 @@ export const formatSpotifySongToPromptifySong = (spotifySong: SpotifyApi.TrackOb
     name: spotifySong.name,
     album_name: spotifySong.album.name,
     album_external_url: spotifySong.album.external_urls.spotify,
+    album_type: spotifySong.album.album_type,
     image: spotifySong.album.images[0],
     artists: spotifySong.artists,
+    release_date: spotifySong.album.release_date,
     external_url: spotifySong.external_urls.spotify,
     duration_ms: spotifySong.duration_ms,
     id: spotifySong.id,
-    uri: spotifySong.uri
+    uri: spotifySong.uri,
+    explicit: spotifySong.explicit
   }
 }
