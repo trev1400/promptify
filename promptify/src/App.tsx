@@ -34,7 +34,7 @@ function App() {
 		try {
 			setIsGenerating(true);
 			const uniqueCompletions = new Set<string>();
-			// Send 3 concurrent API requests to OpenAI to get a completion for the prompt
+			// Send 2 concurrent API requests to OpenAI to get a completion for the prompt
 			const completions = (await Promise.allSettled([
 				fetchCompletion(),
 				fetchCompletion(),
@@ -43,30 +43,30 @@ function App() {
 				value: AxiosResponse<any, any>;
 			}[];
 			// Filter out any rejected API requests
-			completions
+			const successfulCompletions = completions
 				.filter((completion) => completion.status === "fulfilled")
 				.map((completion) => {
-					// Check that Open AI returned results
 					if (completion.value.data.result.length > 0) {
-						// Result is an array of the items from the completion that was returned.
-						// This is usually in a line-separated text string, so we split out the new lines
-						const result: string[] =
-							completion.value.data.result[0].text.split("\n");
-						// Filter the result to exclude empty string values from array, then map to exclude
-						// duplicate completion items
-						result
-							.filter((song: string) => song !== "")
-							.map((song: string) => {
-								uniqueCompletions.add(
-									song
-										.replaceAll('"', "")
-										// Replaces digits and periods since OpenAI completion lists are numbered
-										.replace(/\d+\./gm, "")
-								);
-							});
+						return completion.value.data.result[0].text.split("\n");
+					}
+				})
+				.flat();
+			successfulCompletions
+				.filter((song: string) => song !== "")
+				.map((song: string) => {
+					const artistSubstring = song
+						.substring(0, song.indexOf('"'))
+						.concat(song.substring(song.lastIndexOf('"') + 1))
+						.replace(/\d+\./gm, "");
+					const songName: string[] | null = song.match(/"([^"]+)"/);
+					const artistName: string = artistSubstring
+						.replace("by ", "")
+						.replace("- ", "")
+						.replace("– ", "");
+					if (songName !== null && songName.length > 1) {
+						uniqueCompletions.add(`${songName[1]} ${artistName}`);
 					}
 				});
-			console.log(uniqueCompletions);
 			// We can safely cast array to PromptifySong[] because of our null check
 			const promptifySongs: PromptifySong[] = (
 				await Promise.all(
@@ -93,7 +93,6 @@ function App() {
 		try {
 			const spotifyResponse = await search(songName, "track");
 			const spotifySongs = spotifyResponse.data.tracks.items;
-			console.log(songName, spotifySongs);
 			if (spotifySongs && spotifySongs.length > 0) {
 				return formatSpotifySongToPromptifySong(spotifySongs[0]);
 			}

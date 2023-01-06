@@ -23,7 +23,7 @@ function SongCard(props: SongCardProps) {
 				isBlurred
 				css={{
 					position: "absolute",
-					bgBlur: "#ffffff66",
+					bgBlur: "#ffffff80",
 					borderTop:
 						"$borderWeights$light solid rgba(255, 255, 255, 0.2)",
 					bottom: 0,
