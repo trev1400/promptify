@@ -1,7 +1,7 @@
 import React from "react";
 import { Button, Navbar, Text } from "@nextui-org/react";
 import { logout } from "../spotify-utils";
-import { urlWithProxy } from "../App";
+import { urlWithProxy, drawerWidth } from "../App";
 
 interface PromptifyNavbarProps {
 	spotifyToken: string | null;
@@ -10,7 +10,16 @@ interface PromptifyNavbarProps {
 function PromptifyNavbar(props: PromptifyNavbarProps) {
 	const { spotifyToken } = props;
 	return (
-		<Navbar variant="static" css={{ width: "100vw" }}>
+		<Navbar
+			variant="static"
+			maxWidth="xl"
+			disableShadow
+			css={{
+				width: `calc(100vw - ${drawerWidth}%)`,
+				background: "$background",
+				px: "$6",
+			}}
+		>
 			<Navbar.Brand>
 				<Text b color="inherit" hideIn="xs">
 					Promptify

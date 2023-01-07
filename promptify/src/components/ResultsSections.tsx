@@ -6,10 +6,11 @@ import { PromptifySong } from "../spotify-utils";
 interface ResultsSectionProps {
 	isGenerating: boolean;
 	songs: PromptifySong[];
+	setSongs: React.Dispatch<React.SetStateAction<PromptifySong[]>>;
 }
 
 function ResultsSections(props: ResultsSectionProps) {
-	const { isGenerating, songs } = props;
+	const { isGenerating, songs, setSongs } = props;
 	return (
 		<Container
 			as="section"
@@ -36,7 +37,7 @@ function ResultsSections(props: ResultsSectionProps) {
 			) : songs.length === 0 ? (
 				<Text h3>Generate some songs!</Text>
 			) : (
-				<SongsGrid songs={songs} />
+				<SongsGrid songs={songs} setSongs={setSongs} />
 			)}
 		</Container>
 	);

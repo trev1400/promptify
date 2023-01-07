@@ -11,9 +11,11 @@ export interface PromptifySong {
   release_date: string,
   external_url: string,
   duration_ms: number,
+  duration_string: string,
   id: string,
   uri: string,
   explicit: boolean,
+  saved?: boolean,
 }
 
 interface SpotifyKeys {
@@ -171,8 +173,61 @@ export const search = async (query: string, type: string) => {
 		type,
 		limit: 2
   });
-	return await axios.get(`${baseURL}/search/?${queryParams}`, { headers: headers })
+	return await axios.get(`${baseURL}/search?${queryParams}`, { headers: headers })
 };
+
+/**
+ * Check User's Saved Tracks
+ * https://developer.spotify.com/documentation/web-api/reference/#/operations/check-users-saved-tracks
+ * @returns {Promise}
+ */
+export const getSavedStatus = async (songIds: string) => {
+  const queryParams = querystring.stringify({
+		ids: songIds
+  });
+  return await axios.get(`${baseURL}/me/tracks/contains?${queryParams}`, { headers: headers })
+}
+
+/**
+ * Save Tracks for Current User
+ * https://developer.spotify.com/documentation/web-api/reference/#/operations/save-tracks-user
+ * @returns {Promise}
+ */
+export const saveTrack = async (songIds: string) => {
+  const queryParams = querystring.stringify({
+		ids: songIds
+  });
+  return await axios.put(`${baseURL}/me/tracks?${queryParams}`, {}, { headers: headers })
+}
+
+/**
+ * Remove User's Saved Tracks
+ * https://developer.spotify.com/documentation/web-api/reference/#/operations/remove-tracks-user
+ * @returns {Promise}
+ */
+export const unsaveTrack = async (songIds: string) => {
+  const queryParams = querystring.stringify({
+		ids: songIds
+  });
+  return await axios.delete(`${baseURL}/me/tracks?${queryParams}`, { headers: headers })
+}
+
+// This function converts milliseconds to time in MM:SS format
+const millisecondsToTimeString = (milliseconds: number) => {
+  const hours: number =  Math.floor(milliseconds/(1000*3600))
+  const minutes: number = Math.floor(milliseconds/(1000*60))%60
+  const seconds: number = Math.floor(milliseconds/1000)%60
+  return (hours === 0 ? "" : `${hours.toString()}:`) + (minutes === 0 ? "" : `${minutes.toString()}:`) + (seconds < 10 ? `0${seconds.toString()}` : `${seconds.toString()}`);
+}
+
+const reformatReleaseDate = (release_date: string) => {
+  const tokens: string[] = release_date.split("-")
+  const year = tokens.shift()
+  if (year) {
+    tokens.push(year)
+  }
+  return tokens.join("/")
+}
 
 export const formatSpotifySongToPromptifySong = (spotifySong: SpotifyApi.TrackObjectFull) : PromptifySong => {
   return {
@@ -182,9 +237,10 @@ export const formatSpotifySongToPromptifySong = (spotifySong: SpotifyApi.TrackOb
     album_type: spotifySong.album.album_type,
     image: spotifySong.album.images[0],
     artists: spotifySong.artists,
-    release_date: spotifySong.album.release_date,
+    release_date: reformatReleaseDate(spotifySong.album.release_date),
     external_url: spotifySong.external_urls.spotify,
     duration_ms: spotifySong.duration_ms,
+    duration_string: millisecondsToTimeString(spotifySong.duration_ms),
     id: spotifySong.id,
     uri: spotifySong.uri,
     explicit: spotifySong.explicit

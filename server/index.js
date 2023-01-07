@@ -15,7 +15,8 @@ dotenv.config({ path: "./.env" });
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
-const SPOTIFY_SCOPE = "playlist-modify-public";
+const SPOTIFY_SCOPE =
+	"user-library-modify playlist-modify-public playlist-modify-private playlist-read-private user-library-read";
 
 // Configure OpenAI
 const configuration = new Configuration({
