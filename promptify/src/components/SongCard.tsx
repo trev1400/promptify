@@ -4,27 +4,48 @@ import { FiClock, FiPlus, FiTrash } from "react-icons/fi";
 import { HiHeart, HiOutlineHeart } from "react-icons/hi";
 import { MdOutlineExplicit } from "react-icons/md";
 import { PromptifySong } from "../spotify-utils";
+import { Playlist } from "../App";
 
 interface SongCardProps {
 	song: PromptifySong;
+	playlist: Playlist;
 	handleSaveClick: (
 		e: React.MouseEvent<HTMLDivElement | undefined>,
 		updatedSong: PromptifySong
 	) => void;
+	setPlaylist: React.Dispatch<React.SetStateAction<Playlist>>;
 }
 
 function SongCard(props: SongCardProps) {
-	const { song, handleSaveClick } = props;
+	const { song, playlist, handleSaveClick, setPlaylist } = props;
 
-	const handleCardClick = () => {
-		window.open(song.external_url, "_blank", "noreferrer");
+	const inPlaylist = song.id in playlist;
+
+	// Toggles a song's membership in the playlist
+	const togglePlaylistMembership = () => {
+		// If the song is in the playlist, delete the song from the playlist and then update
+		if (inPlaylist) {
+			const newPlaylist = {
+				...playlist,
+			};
+			delete newPlaylist[song.id];
+			setPlaylist(newPlaylist);
+		} else {
+			// Otherwise, add the song to the playlist and also add a date_added field to preserve the correct
+			// order when rendering the songs in the playlist
+			const newPlaylist = {
+				...playlist,
+				[song.id]: { ...song, time_added_to_playlist: new Date() },
+			};
+			setPlaylist(newPlaylist);
+		}
 	};
 
 	return (
 		<Card
 			isPressable
 			isHoverable
-			onClick={handleCardClick}
+			onClick={() => {}}
 			css={{
 				w: "100%",
 				aspectRatio: "5/6",
@@ -112,9 +133,7 @@ function SongCard(props: SongCardProps) {
 						</Container>
 						<Text color="$background" css={{ marginTop: "$2" }}>
 							<b>Artist: </b>
-							{song.artists
-								.map((artist) => artist.name)
-								.join(", ")}
+							{song.artists}
 						</Text>
 						<Text color="$background">
 							<b>Album: </b>
@@ -123,6 +142,11 @@ function SongCard(props: SongCardProps) {
 						<Text color="$background">
 							<b>Released: </b>
 							{song.release_date}
+						</Text>
+						<Text color="$background">
+							<b>Release Type: </b>
+							{song.release_type.charAt(0).toUpperCase() +
+								song.release_type.slice(1)}
 						</Text>
 						<Container
 							css={{
@@ -153,9 +177,10 @@ function SongCard(props: SongCardProps) {
 							<Button
 								auto
 								rounded
-								color="primary"
-								icon={<FiPlus />}
+								color={inPlaylist ? "error" : "primary"}
+								icon={inPlaylist ? <FiTrash /> : <FiPlus />}
 								css={{ m: 0 }}
+								onClick={togglePlaylistMembership}
 							>
 								<Text
 									css={{ color: "inherit" }}
@@ -163,7 +188,7 @@ function SongCard(props: SongCardProps) {
 									weight="bold"
 									transform="uppercase"
 								>
-									Playlist
+									{inPlaylist ? "Remove" : "Add"}
 								</Text>
 							</Button>
 						</Container>

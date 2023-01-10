@@ -1,13 +1,14 @@
 import axios from 'axios';
 import querystring from 'querystring'
+import { ReleaseType } from './components/ResultsSections';
 
 export interface PromptifySong {
   name: string,
   album_name: string,
   album_external_url: string,
-  album_type: 'album' | 'single' | 'compilation',
+  release_type: string,
   image: SpotifyApi.ImageObject,
-  artists: SpotifyApi.ArtistObjectSimplified[],
+  artists: string,
   release_date: string,
   external_url: string,
   duration_ms: number,
@@ -16,6 +17,7 @@ export interface PromptifySong {
   uri: string,
   explicit: boolean,
   saved?: boolean,
+  time_added_to_playlist?: Date,
 }
 
 interface SpotifyKeys {
@@ -212,7 +214,7 @@ export const unsaveTrack = async (songIds: string) => {
   return await axios.delete(`${baseURL}/me/tracks?${queryParams}`, { headers: headers })
 }
 
-// This function converts milliseconds to time in MM:SS format
+// This function converts milliseconds to time in HH:MM:SS format
 const millisecondsToTimeString = (milliseconds: number) => {
   const hours: number =  Math.floor(milliseconds/(1000*3600))
   const minutes: number = Math.floor(milliseconds/(1000*60))%60
@@ -234,9 +236,9 @@ export const formatSpotifySongToPromptifySong = (spotifySong: SpotifyApi.TrackOb
     name: spotifySong.name,
     album_name: spotifySong.album.name,
     album_external_url: spotifySong.album.external_urls.spotify,
-    album_type: spotifySong.album.album_type,
+    release_type: spotifySong.album.album_type,
     image: spotifySong.album.images[0],
-    artists: spotifySong.artists,
+    artists: spotifySong.artists.map((artist) => artist.name).join(", "),
     release_date: reformatReleaseDate(spotifySong.album.release_date),
     external_url: spotifySong.external_urls.spotify,
     duration_ms: spotifySong.duration_ms,

@@ -6,3 +6,16 @@
 .App {
   height: calc(100vh - 76px);
 }
+
+.play-icon:hover {
+  cursor: pointer;
+  color: #ebebd3;
+}
+
+.filter-collapse h3 {
+  font-size: var(--nextui-fontSizes-md);
+}
+
+.filter-collapse span {
+  font-size: var(--nextui-fontSizes-md);
+}

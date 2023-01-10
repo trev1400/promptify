@@ -13,7 +13,9 @@ const theme = createTheme({
 			background: "#1b2028",
 			backgroundAlpha: "#1b2028",
 			backgroundContrast: "#4b5975",
+			foreground: "#ccccb5",
 			primary: "#23a9d5",
+			primarySolidHover: "#42d0ff",
 		},
 		fonts: {
 			sans: "",

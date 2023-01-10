@@ -18,10 +18,15 @@ export const urlWithProxy = "/api";
 export const drawerWidth = 25;
 const navbarHeight = 76;
 
+export interface Playlist {
+	[id: string]: PromptifySong;
+}
+
 function App() {
 	const [spotifyToken, setSpotifyToken] = useState<string | null>(null);
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 	const [songs, setSongs] = useState<PromptifySong[]>([]);
+	const [playlist, setPlaylist] = useState<Playlist>({});
 	const [prompt, setPrompt] = useState<string>("");
 
 	useEffect(() => {
@@ -158,9 +163,11 @@ function App() {
 					isGenerating={isGenerating}
 					songs={songs}
 					setSongs={setSongs}
+					playlist={playlist}
+					setPlaylist={setPlaylist}
 				/>
 			</Container>
-			<PlaylistDrawer />
+			<PlaylistDrawer playlist={playlist} />
 		</div>
 	);
 }

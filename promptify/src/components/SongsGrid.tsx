@@ -2,14 +2,17 @@ import React from "react";
 import { Grid } from "@nextui-org/react";
 import SongCard from "./SongCard";
 import { PromptifySong, saveTrack, unsaveTrack } from "../spotify-utils";
+import { Playlist } from "../App";
 
 interface SongsGridProps {
 	songs: PromptifySong[];
+	playlist: Playlist;
 	setSongs: React.Dispatch<React.SetStateAction<PromptifySong[]>>;
+	setPlaylist: React.Dispatch<React.SetStateAction<Playlist>>;
 }
 
 function SongsGrid(props: SongsGridProps) {
-	const { songs, setSongs } = props;
+	const { songs, playlist, setSongs, setPlaylist } = props;
 
 	const handleSaveClick = async (
 		e: React.MouseEvent<HTMLDivElement | undefined>,
@@ -41,7 +44,12 @@ function SongsGrid(props: SongsGridProps) {
 		>
 			{songs.map((song: PromptifySong) => (
 				<Grid xs={8} sm={8} md={6} lg={6} xl={4} key={song.id}>
-					<SongCard song={song} handleSaveClick={handleSaveClick} />
+					<SongCard
+						song={song}
+						handleSaveClick={handleSaveClick}
+						playlist={playlist}
+						setPlaylist={setPlaylist}
+					/>
 				</Grid>
 			))}
 		</Grid.Container>
