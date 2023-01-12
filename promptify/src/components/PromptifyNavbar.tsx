@@ -29,7 +29,7 @@ function PromptifyNavbar(props: PromptifyNavbarProps) {
 			}}
 		>
 			<Navbar.Brand css={{ d: "flex", ai: "center", gap: "$4" }}>
-				<Image src="/logo.png" width={42} />
+				<Image src="/logo.png" width={42} alt="Promptify logo" />
 				<Text h4 color="inherit" hideIn="xs" css={{ mt: "$1", mb: 0 }}>
 					Promptify
 				</Text>

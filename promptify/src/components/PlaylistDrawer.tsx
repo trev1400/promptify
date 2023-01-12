@@ -223,7 +223,11 @@ function PlaylistDrawer(props: PlaylistDrawerProps) {
 							)
 						)}`}</span>
 					</Container>
-					<Container display="flex" justify="center">
+					<Container
+						display="flex"
+						justify="center"
+						css={{ marginBottom: "$4" }}
+					>
 						{playlistAdded ? (
 							<Container
 								display="flex"
