@@ -21,7 +21,7 @@ interface PromptIndex {
 const Textarea = styled("textarea", {
 	fontSize: "var(--nextui-fontSizes-2xl)",
 	fontWeight: "var(--nextui-fontWeights-medium)",
-	height: "25vh",
+	height: "20vh",
 	padding: "var(--nextui-space-md) var(--nextui-space-lg)",
 	backgroundColor: "var(--nextui-colors-accents0)",
 	borderRadius: "var(--nextui-space-6)",

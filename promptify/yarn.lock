@@ -1940,10 +1940,10 @@ react-refresh@^0.14.0:
   resolved "https://registry.yarnpkg.com/react-refresh/-/react-refresh-0.14.0.tgz#4e02825378a5f227079554d4284889354e5f553e"
   integrity sha512-wViHqhAd8OHeLS/IRMJjTSDHF3U9eWi62F/MledQGPdJGDhodXJ9PBLNGr6WWL7qlH12Mt3TyTpbS+hGXMjCzQ==
 
-react-spotify-web-playback@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/react-spotify-web-playback/-/react-spotify-web-playback-0.10.0.tgz#f6a88f9f6b57fe994b2d592f5ec784a620ff4e55"
-  integrity sha512-znU0vVrCGOu1+jGX/YmQHsr7tXa1VrwRPvGaRA6NyPhml8XHJJ7X6CPYz2nCvBSg1XhQA2Iv0L5xIcswFcI4fg==
+react-spotify-web-playback@^0.10.1:
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/react-spotify-web-playback/-/react-spotify-web-playback-0.10.1.tgz#aca686ced67100e4ebd22a4d67cc723c8f777e79"
+  integrity sha512-ajxSlyrdWLqBBJKkNjvu1pzdK68Xc1l17Mydx6BP2wt/po77DUbKgUNcVpJJncSDAw61XvwjnN6QhjlFWGKJ9A==
   dependencies:
     "@gilbarbara/react-range-slider" "^0.7.0"
     exenv "^1.2.2"

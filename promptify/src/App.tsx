@@ -5,6 +5,7 @@ import { Container } from "@nextui-org/react";
 import PromptifyNavbar from "./components/PromptifyNavbar";
 import PromptSection from "./components/PromptSection";
 import ResultsSections from "./components/ResultsSections";
+import SpotifyPlayer, { CallbackState } from "react-spotify-web-playback";
 import PlaylistDrawer from "./components/PlaylistDrawer";
 import {
 	accessToken,
@@ -16,17 +17,32 @@ import {
 
 export const urlWithProxy = "/api";
 export const drawerWidth = 25;
-const navbarHeight = 76;
+export const navbarHeight = 76;
+
+interface PlaylistSongs {
+	[id: string]: PromptifySong;
+}
 
 export interface Playlist {
-	[id: string]: PromptifySong;
+	songs: PlaylistSongs;
+	playing: boolean | null;
+}
+
+export interface SongsToPlay {
+	queue: string[];
+	currentSongURI: string;
+	playing: boolean;
 }
 
 function App() {
 	const [spotifyToken, setSpotifyToken] = useState<string | null>(null);
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 	const [songs, setSongs] = useState<PromptifySong[]>([]);
-	const [playlist, setPlaylist] = useState<Playlist>({});
+	const [playlist, setPlaylist] = useState<Playlist>({
+		songs: {},
+		playing: null,
+	});
+	const [songsToPlay, setSongsToPlay] = useState<SongsToPlay | null>(null);
 	const [prompt, setPrompt] = useState<string>("");
 
 	useEffect(() => {
@@ -136,6 +152,23 @@ function App() {
 		setPrompt("");
 	};
 
+	const handleSpotifyPlayerChanges = (state: CallbackState) => {
+		if (songsToPlay !== null) {
+			if (state.type === "player_update") {
+				setSongsToPlay({
+					...songsToPlay,
+					playing: state.isPlaying,
+				});
+			} else if (state.type === "track_update") {
+				setSongsToPlay({
+					...songsToPlay,
+					currentSongURI: state.track.uri,
+					playing: state.isPlaying,
+				});
+			}
+		}
+	};
+
 	return (
 		<div className="App">
 			<PromptifyNavbar spotifyToken={spotifyToken} />
@@ -145,10 +178,10 @@ function App() {
 					d: "flex",
 					fd: "column",
 					width: `calc(100vw - ${drawerWidth}%)`,
-					minHeight: `calc(100vh - ${navbarHeight}px)`,
+					minHeight: `calc(100vh - ${2 * navbarHeight + 4}px)`,
 					px: 0,
-					paddingBottom: "$20",
 					ox: "hidden",
+					oy: "hidden",
 					mx: 0,
 				}}
 			>
@@ -165,9 +198,37 @@ function App() {
 					setSongs={setSongs}
 					playlist={playlist}
 					setPlaylist={setPlaylist}
+					songsToPlay={songsToPlay}
+					setSongsToPlay={setSongsToPlay}
 				/>
 			</Container>
-			<PlaylistDrawer playlist={playlist} />
+			<PlaylistDrawer
+				playlist={playlist}
+				setPlaylist={setPlaylist}
+				songsToPlay={songsToPlay}
+				setSongsToPlay={setSongsToPlay}
+			/>
+			{songsToPlay !== null && (
+				<SpotifyPlayer
+					token={accessToken ?? ""}
+					autoPlay
+					play={songsToPlay.playing}
+					showSaveIcon
+					uris={songsToPlay.queue}
+					callback={handleSpotifyPlayerChanges}
+					styles={{
+						color: "var(--nextui-colors-text)",
+						bgColor: "var(--nextui-colors-accents0)",
+						activeColor: "var(--nextui-colors-primary)",
+						trackNameColor: "var(--nextui-colors-text)",
+						sliderColor: "var(--nextui-colors-primary)",
+						sliderTrackColor:
+							"var(--nextui-colors-backgroundContrast",
+						sliderHandleColor: "var(--nextui-colors-text)",
+						height: navbarHeight,
+					}}
+				/>
+			)}
 		</div>
 	);
 }

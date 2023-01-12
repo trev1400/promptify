@@ -2,23 +2,31 @@ import React from "react";
 import { Grid } from "@nextui-org/react";
 import SongCard from "./SongCard";
 import { PromptifySong, saveTrack, unsaveTrack } from "../spotify-utils";
-import { Playlist } from "../App";
+import { SongsToPlay, Playlist, navbarHeight } from "../App";
 
 interface SongsGridProps {
 	songs: PromptifySong[];
 	playlist: Playlist;
+	songsToPlay: SongsToPlay | null;
 	setSongs: React.Dispatch<React.SetStateAction<PromptifySong[]>>;
 	setPlaylist: React.Dispatch<React.SetStateAction<Playlist>>;
+	setSongsToPlay: React.Dispatch<React.SetStateAction<SongsToPlay | null>>;
 }
 
 function SongsGrid(props: SongsGridProps) {
-	const { songs, playlist, setSongs, setPlaylist } = props;
+	const {
+		songs,
+		playlist,
+		songsToPlay,
+		setSongs,
+		setPlaylist,
+		setSongsToPlay,
+	} = props;
 
 	const handleSaveClick = async (
 		e: React.MouseEvent<HTMLDivElement | undefined>,
 		updatedSong: PromptifySong
 	) => {
-		console.log(e);
 		e.stopPropagation();
 		if (updatedSong.saved) {
 			await unsaveTrack(updatedSong.id);
@@ -40,6 +48,7 @@ function SongsGrid(props: SongsGridProps) {
 			justify="center"
 			css={{
 				"@md": { justifyContent: "flex-start" },
+				mb: songsToPlay !== null ? navbarHeight : 0,
 			}}
 		>
 			{songs.map((song: PromptifySong) => (
@@ -49,6 +58,7 @@ function SongsGrid(props: SongsGridProps) {
 						handleSaveClick={handleSaveClick}
 						playlist={playlist}
 						setPlaylist={setPlaylist}
+						setSongsToPlay={setSongsToPlay}
 					/>
 				</Grid>
 			))}

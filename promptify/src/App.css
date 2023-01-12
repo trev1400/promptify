@@ -1,13 +1,13 @@
 #root {
   width: 100vw;
-  margin: 1rem auto;
+  margin: 0 auto;
 }
 
 .App {
-  height: calc(100vh - 76px);
+  height: 100vh;
 }
 
-.play-icon:hover {
+.playlist-item-icon:hover {
   cursor: pointer;
   color: #ebebd3;
 }
@@ -18,4 +18,14 @@
 
 .filter-collapse span {
   font-size: var(--nextui-fontSizes-md);
+}
+
+.PlayerRSWP {
+  bottom: 0;
+  position: fixed;
+  z-index: 1001;
+}
+
+.PlayerRSWP button {
+  margin: 0.5em 0;
 }

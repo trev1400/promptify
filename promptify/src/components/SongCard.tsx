@@ -4,7 +4,7 @@ import { FiClock, FiPlus, FiTrash } from "react-icons/fi";
 import { HiHeart, HiOutlineHeart } from "react-icons/hi";
 import { MdOutlineExplicit } from "react-icons/md";
 import { PromptifySong } from "../spotify-utils";
-import { Playlist } from "../App";
+import { SongsToPlay, Playlist } from "../App";
 
 interface SongCardProps {
 	song: PromptifySong;
@@ -14,12 +14,14 @@ interface SongCardProps {
 		updatedSong: PromptifySong
 	) => void;
 	setPlaylist: React.Dispatch<React.SetStateAction<Playlist>>;
+	setSongsToPlay: React.Dispatch<React.SetStateAction<SongsToPlay | null>>;
 }
 
 function SongCard(props: SongCardProps) {
-	const { song, playlist, handleSaveClick, setPlaylist } = props;
+	const { song, playlist, handleSaveClick, setPlaylist, setSongsToPlay } =
+		props;
 
-	const inPlaylist = song.id in playlist;
+	const inPlaylist = song.id in playlist.songs;
 
 	// Toggles a song's membership in the playlist
 	const togglePlaylistMembership = () => {
@@ -28,24 +30,39 @@ function SongCard(props: SongCardProps) {
 			const newPlaylist = {
 				...playlist,
 			};
-			delete newPlaylist[song.id];
+			delete newPlaylist.songs[song.id];
 			setPlaylist(newPlaylist);
 		} else {
 			// Otherwise, add the song to the playlist and also add a date_added field to preserve the correct
 			// order when rendering the songs in the playlist
 			const newPlaylist = {
 				...playlist,
-				[song.id]: { ...song, time_added_to_playlist: new Date() },
+				songs: {
+					...playlist.songs,
+					[song.id]: { ...song, time_added_to_playlist: new Date() },
+				},
 			};
 			setPlaylist(newPlaylist);
 		}
+	};
+
+	const handleCardPress = () => {
+		setSongsToPlay({
+			queue: [song.uri],
+			currentSongURI: song.uri,
+			playing: true,
+		});
+		setPlaylist({
+			...playlist,
+			playing: null,
+		});
 	};
 
 	return (
 		<Card
 			isPressable
 			isHoverable
-			onClick={() => {}}
+			onClick={handleCardPress}
 			css={{
 				w: "100%",
 				aspectRatio: "5/6",
@@ -141,12 +158,11 @@ function SongCard(props: SongCardProps) {
 						</Text>
 						<Text color="$background">
 							<b>Released: </b>
-							{song.release_date}
+							{song.release_date_string}
 						</Text>
 						<Text color="$background">
 							<b>Release Type: </b>
-							{song.release_type.charAt(0).toUpperCase() +
-								song.release_type.slice(1)}
+							{song.release_type}
 						</Text>
 						<Container
 							css={{

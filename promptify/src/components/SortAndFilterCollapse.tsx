@@ -51,7 +51,7 @@ function SortAndFilterCollapse(props: SortAndFilterCollapseProps) {
 	};
 
 	return (
-		<Container display="flex" justify="flex-start" css={{ p: 0 }}>
+		<Container display="flex" justify="flex-end" css={{ p: 0 }}>
 			<Collapse
 				bordered
 				divider={false}
@@ -62,7 +62,7 @@ function SortAndFilterCollapse(props: SortAndFilterCollapseProps) {
 				css={{
 					w: expanded ? "100%" : "25%",
 					background: "$accents0",
-					m: "0 0 0 $12",
+					m: "0 $12",
 				}}
 				className="filter-collapse"
 			>

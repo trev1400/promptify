@@ -16,7 +16,15 @@ const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
 const SPOTIFY_REDIRECT_URI = process.env.SPOTIFY_REDIRECT_URI;
 const SPOTIFY_SCOPE =
-	"user-library-modify playlist-modify-public playlist-modify-private playlist-read-private user-library-read";
+	"user-library-modify \
+	playlist-modify-public \
+	playlist-modify-private \
+	user-library-read \
+	streaming \
+	user-read-email \
+	user-read-private \
+	user-read-playback-state \
+	user-modify-playback-state";
 
 // Configure OpenAI
 const configuration = new Configuration({
@@ -34,8 +42,8 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 // Endpoint for fetching a completion from OpenAI
 app.post("/api/completion", async (req, res) => {
 	const completion = await openai.createCompletion({
-		model: "text-davinci-003",
-		prompt: `list of ${req.body.prompt}`,
+		model: "text-davinci-002",
+		prompt: `song list of ${req.body.prompt}`,
 		temperature: 0.7,
 		max_tokens: 256,
 		top_p: 1,

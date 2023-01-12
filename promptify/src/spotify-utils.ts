@@ -1,6 +1,5 @@
 import axios from 'axios';
 import querystring from 'querystring'
-import { ReleaseType } from './components/ResultsSections';
 
 export interface PromptifySong {
   name: string,
@@ -9,10 +8,12 @@ export interface PromptifySong {
   release_type: string,
   image: SpotifyApi.ImageObject,
   artists: string,
-  release_date: string,
+  release_date: Date,
+  release_date_string: string,
   external_url: string,
   duration_ms: number,
   duration_string: string,
+  popularity: number,
   id: string,
   uri: string,
   explicit: boolean,
@@ -214,6 +215,32 @@ export const unsaveTrack = async (songIds: string) => {
   return await axios.delete(`${baseURL}/me/tracks?${queryParams}`, { headers: headers })
 }
 
+/**
+ * Get Current User's Profile
+ * https://developer.spotify.com/documentation/web-api/reference/#/operations/get-current-users-profile
+ * @returns {Promise}
+ */
+export const getCurrentUserProfile = async () => {
+  return await axios.get(`${baseURL}/me`, { headers: headers })
+}
+
+/**
+ * Create Playlist and Add Items
+ * https://developer.spotify.com/documentation/web-api/reference/#/operations/create-playlist
+ * https://developer.spotify.com/documentation/web-api/reference/#/operations/add-tracks-to-playlist
+ * @returns {Promise}
+ */
+export const createPlaylist = async (name: string, songURIs: string) => {
+  const currentUserRes = await getCurrentUserProfile()
+  const user_id = currentUserRes.data.id
+  const createPlaylistRes =  await axios.post(`${baseURL}/users/${user_id}/playlists`, {name: name, description: "", public: false}, { headers: headers })
+  const playlist_id = createPlaylistRes.data.id
+  const queryParams = querystring.stringify({
+		uris: songURIs
+  });
+  return await axios.post(`${baseURL}/playlists/${playlist_id}/tracks?${queryParams}`, {}, { headers: headers })
+}
+
 // This function converts milliseconds to time in HH:MM:SS format
 const millisecondsToTimeString = (milliseconds: number) => {
   const hours: number =  Math.floor(milliseconds/(1000*3600))
@@ -236,13 +263,15 @@ export const formatSpotifySongToPromptifySong = (spotifySong: SpotifyApi.TrackOb
     name: spotifySong.name,
     album_name: spotifySong.album.name,
     album_external_url: spotifySong.album.external_urls.spotify,
-    release_type: spotifySong.album.album_type,
+    release_type: spotifySong.album.album_type.charAt(0).toUpperCase() + spotifySong.album.album_type.slice(1),
     image: spotifySong.album.images[0],
     artists: spotifySong.artists.map((artist) => artist.name).join(", "),
-    release_date: reformatReleaseDate(spotifySong.album.release_date),
+    release_date: new Date(spotifySong.album.release_date),
+    release_date_string: reformatReleaseDate(spotifySong.album.release_date),
     external_url: spotifySong.external_urls.spotify,
     duration_ms: spotifySong.duration_ms,
     duration_string: millisecondsToTimeString(spotifySong.duration_ms),
+    popularity: spotifySong.popularity,
     id: spotifySong.id,
     uri: spotifySong.uri,
     explicit: spotifySong.explicit
