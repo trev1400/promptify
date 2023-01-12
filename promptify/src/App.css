@@ -7,7 +7,7 @@
   height: 100vh;
 }
 
-.playlist-item-icon:hover {
+.hoverable-icon:hover {
   cursor: pointer;
   color: #ebebd3;
 }

@@ -1,16 +1,16 @@
-const { Configuration, OpenAIApi } = require("openai");
-const dotenv = require("dotenv");
-const querystring = require("querystring");
-const axios = require("axios");
-const { nanoid } = require("nanoid");
-const cookieParser = require("cookie-parser");
-const express = require("express"),
-	PORT = 5000,
-	app = express();
+import { Configuration, OpenAIApi } from "openai";
+import dotenv from "dotenv";
+import querystring from "querystring";
+import axios from "axios";
+import { nanoid } from "nanoid";
+import cookieParser from "cookie-parser";
+import express from "express";
+import bodyParser from "body-parser";
 
-const bodyParser = require("body-parser");
-// Set path to .env file
-dotenv.config({ path: "./.env" });
+const app = express();
+
+// // Set path to .env file
+// dotenv.config({ path: "./.env" });
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -122,9 +122,9 @@ app.get("/api/callback", async (req, res) => {
 				refresh_token,
 				expires_in,
 			});
-			res.redirect(`http://localhost:5173/?${queryParams}`);
+			res.redirect(`https://promptify.vercel.app/?${queryParams}`);
 		} else {
-			res.send("http://localhost:5173");
+			res.send("https://promptify.vercel.app/");
 		}
 	} catch (error) {
 		res.send(error);
@@ -160,4 +160,4 @@ app.get("/api/refresh_token", async (req, res) => {
 	}
 });
 
-module.exports = app;
+export default app;

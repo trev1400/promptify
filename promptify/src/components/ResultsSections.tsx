@@ -75,7 +75,8 @@ function ResultsSections(props: ResultsSectionProps) {
 		} else {
 			return (
 				<Text h3 css={{ textAlign: "center" }}>
-					Log in to generate some songs!
+					Log in with a Spotify Premium account to generate some
+					songs!
 				</Text>
 			);
 		}

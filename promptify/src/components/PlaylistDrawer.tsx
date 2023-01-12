@@ -340,7 +340,7 @@ function PlaylistDrawer(props: PlaylistDrawerProps) {
 										songsToPlay?.playing ? (
 											<IoPauseCircle
 												size={26}
-												className="playlist-item-icon"
+												className="hoverable-icon"
 												onClick={
 													handlePlaylistSongPause
 												}
@@ -348,7 +348,7 @@ function PlaylistDrawer(props: PlaylistDrawerProps) {
 										) : (
 											<IoPlayCircle
 												size={26}
-												className="playlist-item-icon"
+												className="hoverable-icon"
 												onClick={() =>
 													handlePlaylistSongPlay(song)
 												}
@@ -367,7 +367,7 @@ function PlaylistDrawer(props: PlaylistDrawerProps) {
 															"center",
 													}}
 												>
-													<FiMoreVertical className="playlist-item-icon" />
+													<FiMoreVertical className="hoverable-icon" />
 												</div>
 											</Dropdown.Trigger>
 											<Dropdown.Menu

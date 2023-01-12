@@ -30,7 +30,7 @@ function PromptSection(props: PromptSectionProps) {
 				ai: "center",
 				p: "$12 $20",
 				mw: "100%",
-				rowGap: "$4",
+				rowGap: "$8",
 			}}
 		>
 			<ControlledTextArea
