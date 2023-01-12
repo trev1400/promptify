@@ -11,6 +11,7 @@ interface ResultsSectionProps {
 	songs: PromptifySong[];
 	playlist: Playlist;
 	songsToPlay: SongsToPlay | null;
+	error: boolean;
 	setSongs: React.Dispatch<React.SetStateAction<PromptifySong[]>>;
 	setPlaylist: React.Dispatch<React.SetStateAction<Playlist>>;
 	setSongsToPlay: React.Dispatch<React.SetStateAction<SongsToPlay | null>>;
@@ -47,6 +48,7 @@ function ResultsSections(props: ResultsSectionProps) {
 		songs,
 		playlist,
 		songsToPlay,
+		error,
 		setSongs,
 		setPlaylist,
 		setSongsToPlay,
@@ -57,6 +59,27 @@ function ResultsSections(props: ResultsSectionProps) {
 	const [libraryStatuses, setLibraryStatuses] = useState<Set<string>>(
 		new Set()
 	);
+
+	const getEmptyResultsSectionText = () => {
+		if (accessToken) {
+			return error ? (
+				<Text h3 css={{ textAlign: "center" }}>
+					Error fetching prompt results, OpenAI model may be
+					overloaded. Please try again in a few moments!
+				</Text>
+			) : (
+				<Text h3 css={{ textAlign: "center" }}>
+					Generate some songs!
+				</Text>
+			);
+		} else {
+			return (
+				<Text h3 css={{ textAlign: "center" }}>
+					Log in to generate some songs!
+				</Text>
+			);
+		}
+	};
 
 	// Function that returns different sort functions depending on which sort option is selected
 	const fetchSortFunction = () => {
@@ -166,11 +189,7 @@ function ResultsSections(props: ResultsSectionProps) {
 					/>
 				</Fragment>
 			) : songs.length === 0 ? (
-				accessToken ? (
-					<Text h3>Generate some songs!</Text>
-				) : (
-					<Text h3>Log in to generate some songs!</Text>
-				)
+				getEmptyResultsSectionText()
 			) : (
 				<Fragment>
 					<SortAndFilterCollapse

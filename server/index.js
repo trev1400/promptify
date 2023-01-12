@@ -41,16 +41,26 @@ app.use(cookieParser(process.env.COOKIE_SECRET));
 
 // Endpoint for fetching a completion from OpenAI
 app.post("/api/completion", async (req, res) => {
-	const completion = await openai.createCompletion({
-		model: "text-davinci-002",
-		prompt: `song list of ${req.body.prompt}`,
-		temperature: 0.7,
-		max_tokens: 256,
-		top_p: 1,
-		frequency_penalty: 0,
-		presence_penalty: 0,
-	});
-	res.status(200).json({ result: completion.data.choices });
+	try {
+		const completion = await openai.createCompletion({
+			model: "text-davinci-003",
+			prompt: `song list of ${req.body.prompt}`,
+			temperature: 0.7,
+			max_tokens: 256,
+			top_p: 1,
+			frequency_penalty: 0,
+			presence_penalty: 0,
+		});
+		res.status(200).json({ result: completion.data.choices });
+	} catch (error) {
+		if (error.response) {
+			res.status(error.response.status).json({
+				error: error.response.data,
+			});
+		} else {
+			res.json({ error: error.message });
+		}
+	}
 });
 
 // Endpoint for authorizing with Spotify

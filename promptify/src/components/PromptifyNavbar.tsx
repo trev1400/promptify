@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, Navbar, Text } from "@nextui-org/react";
+import { Button, Navbar, Text, Image } from "@nextui-org/react";
 import { logout } from "../spotify-utils";
 import { urlWithProxy, drawerWidth } from "../App";
 
@@ -20,8 +20,9 @@ function PromptifyNavbar(props: PromptifyNavbarProps) {
 				px: "$6",
 			}}
 		>
-			<Navbar.Brand>
-				<Text b color="inherit" hideIn="xs">
+			<Navbar.Brand css={{ d: "flex", ai: "center", gap: "$2" }}>
+				<Image src="logo.png" width={42} />
+				<Text h4 color="inherit" hideIn="xs" css={{ mt: "$1", mb: 0 }}>
 					Promptify
 				</Text>
 			</Navbar.Brand>

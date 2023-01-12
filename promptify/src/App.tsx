@@ -38,6 +38,7 @@ function App() {
 	const [spotifyToken, setSpotifyToken] = useState<string | null>(null);
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 	const [songs, setSongs] = useState<PromptifySong[]>([]);
+	const [error, setError] = useState<boolean>(false);
 	const [playlist, setPlaylist] = useState<Playlist>({
 		songs: {},
 		playing: null,
@@ -76,48 +77,54 @@ function App() {
 					}
 				})
 				.flat();
-			successfulCompletions
-				.filter((song: string) => song !== "")
-				.map((song: string) => {
-					const artistSubstring = song
-						.substring(0, song.indexOf('"'))
-						.concat(song.substring(song.lastIndexOf('"') + 1))
-						.replace(/\d+\./gm, "");
-					const songName: string = song.substring(
-						song.indexOf('"') + 1,
-						song.lastIndexOf('"')
+			if (successfulCompletions.length === 0) {
+				setError(true);
+				setTimeout(() => setError(false), 5000);
+			} else {
+				successfulCompletions
+					.filter((song: string) => song !== "")
+					.map((song: string) => {
+						const artistSubstring = song
+							.substring(0, song.indexOf('"'))
+							.concat(song.substring(song.lastIndexOf('"') + 1))
+							.replace(/\d+\./gm, "");
+						const songName: string = song.substring(
+							song.indexOf('"') + 1,
+							song.lastIndexOf('"')
+						);
+						const artistName: string = artistSubstring
+							.replace("by ", "")
+							.replace("- ", "")
+							.replace("– ", "");
+						uniqueCompletions.add(`${songName} ${artistName}`);
+					});
+				// We can safely cast array to PromptifySong[] because of our null check
+				const promptifySongs: PromptifySong[] = (
+					await Promise.all(
+						Array.from(uniqueCompletions).map((song: string) => {
+							return getSongFromCompletion(song);
+						})
+					)
+				).filter(
+					(promptifySong) => promptifySong !== null
+				) as PromptifySong[];
+				// Filter out any dupes that the Spotify API returns
+				const songIds = promptifySongs.map((song) => song.id);
+				const uniquePromptifySongs: PromptifySong[] =
+					promptifySongs.filter(
+						({ id }, index) => !songIds.includes(id, index + 1)
 					);
-					const artistName: string = artistSubstring
-						.replace("by ", "")
-						.replace("- ", "")
-						.replace("– ", "");
-					uniqueCompletions.add(`${songName} ${artistName}`);
-				});
-			// We can safely cast array to PromptifySong[] because of our null check
-			const promptifySongs: PromptifySong[] = (
-				await Promise.all(
-					Array.from(uniqueCompletions).map((song: string) => {
-						return getSongFromCompletion(song);
-					})
-				)
-			).filter(
-				(promptifySong) => promptifySong !== null
-			) as PromptifySong[];
-			// Filter out any dupes that the Spotify API returns
-			const songIds = promptifySongs.map((song) => song.id);
-			const uniquePromptifySongs: PromptifySong[] = promptifySongs.filter(
-				({ id }, index) => !songIds.includes(id, index + 1)
-			);
-			// Get the saved status of the songs
-			const uniquePromptifySongsWithSaved: PromptifySong[] =
-				await Promise.all(
-					uniquePromptifySongs.map(async (song) => {
-						const savedStatus = await getSavedStatus(song.id);
-						return { ...song, saved: savedStatus.data[0] };
-					})
-				);
-			setSongs(uniquePromptifySongsWithSaved);
-			setIsGenerating(false);
+				// Get the saved status of the songs
+				const uniquePromptifySongsWithSaved: PromptifySong[] =
+					await Promise.all(
+						uniquePromptifySongs.map(async (song) => {
+							const savedStatus = await getSavedStatus(song.id);
+							return { ...song, saved: savedStatus.data[0] };
+						})
+					);
+				setSongs(uniquePromptifySongsWithSaved);
+				setIsGenerating(false);
+			}
 		} catch (error) {
 			console.log(error);
 		}
@@ -200,6 +207,7 @@ function App() {
 					setPlaylist={setPlaylist}
 					songsToPlay={songsToPlay}
 					setSongsToPlay={setSongsToPlay}
+					error={error}
 				/>
 			</Container>
 			<PlaylistDrawer

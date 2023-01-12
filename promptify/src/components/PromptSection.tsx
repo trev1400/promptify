@@ -57,13 +57,6 @@ function PromptSection(props: PromptSectionProps) {
 				}}
 			>
 				<Button
-					size="lg"
-					onPress={fetchCompletions}
-					disabled={prompt === "" || isGenerating || !accessToken}
-				>
-					Generate
-				</Button>
-				<Button
 					color="error"
 					size="lg"
 					iconRight={<FiXCircle size={20} />}
@@ -71,6 +64,13 @@ function PromptSection(props: PromptSectionProps) {
 					onPress={handlePromptClear}
 				>
 					Clear
+				</Button>
+				<Button
+					size="lg"
+					onPress={fetchCompletions}
+					disabled={prompt === "" || isGenerating || !accessToken}
+				>
+					Generate
 				</Button>
 			</Container>
 		</Container>
