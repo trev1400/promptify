@@ -126,7 +126,8 @@ function App() {
 				setIsGenerating(false);
 			}
 		} catch (error) {
-			console.log(error);
+			setError(true);
+			setTimeout(() => setError(false), 5000);
 		}
 	};
 
