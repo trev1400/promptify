@@ -1,7 +1,7 @@
 
 # Promptify
 
-*This project was created as a capstone for my undergraduate degree in Computer Science at Brown Univeristy*
+*This project was created as a capstone for my undergraduate degree in Computer Science at Brown University*
 
 **Course:** CSCI 1300 User Interfaces and User Experience
 
