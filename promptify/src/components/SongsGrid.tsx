@@ -8,6 +8,7 @@ interface SongsGridProps {
 	songs: PromptifySong[];
 	playlist: Playlist;
 	songsToPlay: SongsToPlay | null;
+	isMobile: boolean;
 	setSongs: React.Dispatch<React.SetStateAction<PromptifySong[]>>;
 	setPlaylist: React.Dispatch<React.SetStateAction<Playlist>>;
 	setSongsToPlay: React.Dispatch<React.SetStateAction<SongsToPlay | null>>;
@@ -18,6 +19,7 @@ function SongsGrid(props: SongsGridProps) {
 		songs,
 		playlist,
 		songsToPlay,
+		isMobile,
 		setSongs,
 		setPlaylist,
 		setSongsToPlay,
@@ -44,7 +46,7 @@ function SongsGrid(props: SongsGridProps) {
 
 	return (
 		<Grid.Container
-			gap={4}
+			gap={isMobile ? 2 : 4}
 			justify="center"
 			css={{
 				"@md": { justifyContent: "flex-start" },
@@ -52,13 +54,21 @@ function SongsGrid(props: SongsGridProps) {
 			}}
 		>
 			{songs.map((song: PromptifySong) => (
-				<Grid xs={8} sm={8} md={6} lg={6} xl={4} key={song.id}>
+				<Grid
+					xs={isMobile ? 10 : 8}
+					sm={6}
+					md={6}
+					lg={6}
+					xl={4}
+					key={song.id}
+				>
 					<SongCard
 						song={song}
 						handleSaveClick={handleSaveClick}
 						playlist={playlist}
 						setPlaylist={setPlaylist}
 						setSongsToPlay={setSongsToPlay}
+						isMobile={isMobile}
 					/>
 				</Grid>
 			))}

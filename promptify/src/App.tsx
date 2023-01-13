@@ -7,6 +7,7 @@ import PromptSection from "./components/PromptSection";
 import ResultsSections from "./components/ResultsSections";
 import SpotifyPlayer, { CallbackState } from "react-spotify-web-playback";
 import PlaylistDrawer from "./components/PlaylistDrawer";
+import { createTheme, useMediaQuery } from "@mui/material";
 import {
 	accessToken,
 	search,
@@ -34,7 +35,20 @@ export interface SongsToPlay {
 	playing: boolean;
 }
 
+export const muiTheme = createTheme({
+	breakpoints: {
+		values: {
+			xs: 0,
+			sm: 650,
+			md: 960,
+			lg: 1280,
+			xl: 1400,
+		},
+	},
+});
+
 function App() {
+	const isMobile: boolean = useMediaQuery(muiTheme.breakpoints.down("sm"));
 	const [spotifyToken, setSpotifyToken] = useState<string | null>(null);
 	const [isGenerating, setIsGenerating] = useState<boolean>(false);
 	const [songs, setSongs] = useState<PromptifySong[]>([]);
@@ -43,6 +57,7 @@ function App() {
 		songs: {},
 		playing: null,
 	});
+	const [playlistOpen, setPlaylistOpen] = useState<boolean>(false);
 	const [songsToPlay, setSongsToPlay] = useState<SongsToPlay | null>(null);
 	const [prompt, setPrompt] = useState<string>("");
 
@@ -59,6 +74,11 @@ function App() {
 	const fetchCompletions = async () => {
 		try {
 			setIsGenerating(true);
+			const timeoutID: number = setTimeout(() => {
+				setIsGenerating(false);
+				setError(true);
+				setTimeout(() => setError(false), 5000);
+			}, 25000);
 			const uniqueCompletions = new Set<string>();
 			// Send 2 concurrent API requests to OpenAI to get a completion for the prompt
 			const completions = (await Promise.allSettled([
@@ -123,10 +143,12 @@ function App() {
 						})
 					);
 				setSongs(uniquePromptifySongsWithSaved);
+				clearTimeout(timeoutID);
 				setIsGenerating(false);
 			}
 		} catch (error) {
 			setError(true);
+			setIsGenerating(false);
 			setTimeout(() => setError(false), 5000);
 		}
 	};
@@ -147,7 +169,9 @@ function App() {
 				return formatSpotifySongToPromptifySong(spotifySongs[0]);
 			}
 		} catch (e) {
-			console.error(e);
+			setError(true);
+			setIsGenerating(false);
+			setTimeout(() => setError(false), 5000);
 		}
 		return null;
 	};
@@ -177,9 +201,17 @@ function App() {
 		}
 	};
 
+	const handlePlaylistToggle = () => {
+		setPlaylistOpen(!playlistOpen);
+	};
+
 	return (
 		<div className="App">
-			<PromptifyNavbar spotifyToken={spotifyToken} />
+			<PromptifyNavbar
+				spotifyToken={spotifyToken}
+				isMobile={isMobile}
+				handlePlaylistToggle={handlePlaylistToggle}
+			/>
 			<Container
 				as="main"
 				css={{
@@ -191,11 +223,16 @@ function App() {
 					ox: "hidden",
 					oy: "hidden",
 					mx: 0,
+					"@smMax": {
+						width: "100vw",
+						maxWidth: "100vw",
+					},
 				}}
 			>
 				<PromptSection
 					prompt={prompt}
 					isGenerating={isGenerating}
+					isMobile={isMobile}
 					handlePromptChange={handlePromptChange}
 					handlePromptClear={handlePromptClear}
 					fetchCompletions={fetchCompletions}
@@ -209,6 +246,7 @@ function App() {
 					songsToPlay={songsToPlay}
 					setSongsToPlay={setSongsToPlay}
 					error={error}
+					isMobile={isMobile}
 				/>
 			</Container>
 			<PlaylistDrawer
@@ -216,6 +254,8 @@ function App() {
 				setPlaylist={setPlaylist}
 				songsToPlay={songsToPlay}
 				setSongsToPlay={setSongsToPlay}
+				playlistOpen={playlistOpen}
+				handlePlaylistToggle={handlePlaylistToggle}
 			/>
 			{songsToPlay !== null && (
 				<SpotifyPlayer

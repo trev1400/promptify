@@ -9,6 +9,7 @@ import { SongsToPlay, Playlist } from "../App";
 interface SongCardProps {
 	song: PromptifySong;
 	playlist: Playlist;
+	isMobile: boolean;
 	handleSaveClick: (
 		e: React.MouseEvent<HTMLDivElement | undefined>,
 		updatedSong: PromptifySong
@@ -18,8 +19,14 @@ interface SongCardProps {
 }
 
 function SongCard(props: SongCardProps) {
-	const { song, playlist, handleSaveClick, setPlaylist, setSongsToPlay } =
-		props;
+	const {
+		song,
+		playlist,
+		isMobile,
+		handleSaveClick,
+		setPlaylist,
+		setSongsToPlay,
+	} = props;
 
 	const inPlaylist = song.id in playlist.songs;
 
@@ -86,12 +93,28 @@ function SongCard(props: SongCardProps) {
 					borderRadius: "14px",
 					color: "#1b2028",
 					"&:hover": { cursor: "pointer", color: "#23a9d5" },
+					"@smMax": {
+						w: 36,
+						h: 36,
+						p: "$2",
+					},
+					"@mdMax": {
+						w: 42,
+						h: 42,
+						p: "$3",
+					},
 				}}
 			>
 				{song.saved ? (
-					<HiHeart size={28} style={{ color: "23a9d5" }} />
+					<HiHeart
+						size={isMobile ? 16 : 28}
+						style={{ color: "23a9d5" }}
+					/>
 				) : (
-					<HiOutlineHeart size={28} style={{ color: "inherit" }} />
+					<HiOutlineHeart
+						size={isMobile ? 16 : 28}
+						style={{ color: "inherit" }}
+					/>
 				)}
 			</Card.Header>
 			<Card.Body css={{ p: 0 }}>
@@ -114,10 +137,24 @@ function SongCard(props: SongCardProps) {
 					zIndex: 1,
 				}}
 			>
-				<Grid.Container css={{ p: "$4" }}>
+				<Grid.Container
+					css={{
+						p: "$4",
+						"@smMax": {
+							p: "$1!important",
+						},
+						"@mdMax": {
+							p: "$2!important",
+						},
+					}}
+				>
 					<Grid
 						xs={12}
-						css={{ d: "flex", fd: "column", ai: "flex-start" }}
+						css={{
+							d: "flex",
+							fd: "column",
+							ai: "flex-start",
+						}}
 					>
 						<Container
 							css={{
@@ -126,21 +163,26 @@ function SongCard(props: SongCardProps) {
 								p: 0,
 								m: 0,
 								gap: "$3",
+								"@mdMax": {
+									gap: "$1",
+								},
 							}}
 						>
 							<Text
-								h4
+								h4={!isMobile}
+								h6={isMobile}
 								color="$background"
 								css={{
 									m: 0,
 									fontWeight: "$semibold",
+									"@mdMax": { fontSize: "$base" },
 								}}
 							>
 								{song.name}
 							</Text>
 							{song.explicit && (
 								<MdOutlineExplicit
-									size={22}
+									size={isMobile ? 14 : 22}
 									style={{
 										color: "#1b2028",
 										marginTop: 1,
@@ -148,19 +190,40 @@ function SongCard(props: SongCardProps) {
 								/>
 							)}
 						</Container>
-						<Text color="$background" css={{ marginTop: "$2" }}>
+						<Text
+							color="$background"
+							css={{
+								marginTop: "$2",
+								"@mdMax": { fontSize: "$xs" },
+							}}
+						>
 							<b>Artist: </b>
 							{song.artists}
 						</Text>
-						<Text color="$background">
+						<Text
+							color="$background"
+							css={{
+								"@mdMax": { fontSize: "$xs" },
+							}}
+						>
 							<b>Album: </b>
 							{song.album_name}
 						</Text>
-						<Text color="$background">
+						<Text
+							color="$background"
+							css={{
+								"@mdMax": { fontSize: "$xs" },
+							}}
+						>
 							<b>Released: </b>
 							{song.release_date_string}
 						</Text>
-						<Text color="$background">
+						<Text
+							color="$background"
+							css={{
+								"@mdMax": { fontSize: "$xs" },
+							}}
+						>
 							<b>Release Type: </b>
 							{song.release_type}
 						</Text>
@@ -184,23 +247,36 @@ function SongCard(props: SongCardProps) {
 								}}
 							>
 								<FiClock
+									size={isMobile ? 12 : 16}
 									style={{ color: "#1b2028", marginTop: 2 }}
 								/>
-								<Text color="$background">
+								<Text
+									color="$background"
+									css={{
+										"@mdMax": { fontSize: "$xs" },
+									}}
+								>
 									{song.duration_string}
 								</Text>
 							</Container>
 							<Button
 								auto
 								rounded
+								size={isMobile ? "sm" : "md"}
 								color={inPlaylist ? "error" : "primary"}
-								icon={inPlaylist ? <FiTrash /> : <FiPlus />}
+								icon={
+									inPlaylist ? (
+										<FiTrash size={isMobile ? 12 : 16} />
+									) : (
+										<FiPlus size={isMobile ? 12 : 16} />
+									)
+								}
 								css={{ m: 0 }}
 								onClick={togglePlaylistMembership}
 							>
 								<Text
 									css={{ color: "inherit" }}
-									size={12}
+									size={isMobile ? 10 : 12}
 									weight="bold"
 									transform="uppercase"
 								>

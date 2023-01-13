@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { SongsToPlay, drawerWidth, Playlist } from "../App";
+import { SongsToPlay, drawerWidth, Playlist, muiTheme } from "../App";
 import { GoPrimitiveDot } from "react-icons/go";
 import { IoPlayCircle, IoPauseCircle } from "react-icons/io5";
 import { FiCheck, FiMoreVertical, FiTrash } from "react-icons/fi";
@@ -15,12 +15,15 @@ import {
 import { styled } from "@stitches/react";
 import Drawer from "@mui/material/Drawer";
 import { createPlaylist, PromptifySong } from "../spotify-utils";
+import { useMediaQuery } from "@mui/material";
 
 interface PlaylistDrawerProps {
 	playlist: Playlist;
 	songsToPlay: SongsToPlay | null;
+	playlistOpen: boolean;
 	setSongsToPlay: React.Dispatch<React.SetStateAction<SongsToPlay | null>>;
 	setPlaylist: React.Dispatch<React.SetStateAction<Playlist>>;
+	handlePlaylistToggle: () => void;
 }
 
 const Input = styled("input", {
@@ -52,7 +55,15 @@ const millisecondsToTimeString = (milliseconds: number) => {
 };
 
 function PlaylistDrawer(props: PlaylistDrawerProps) {
-	const { playlist, songsToPlay, setSongsToPlay, setPlaylist } = props;
+	const {
+		playlist,
+		songsToPlay,
+		playlistOpen,
+		setSongsToPlay,
+		setPlaylist,
+		handlePlaylistToggle,
+	} = props;
+	const hideDrawer: boolean = useMediaQuery(muiTheme.breakpoints.down("md"));
 	const [playlistName, setPlaylistName] =
 		useState<string>("Promptify Playlist");
 	const [playlistAdded, setPlaylistAdded] = useState<boolean>(false);
@@ -160,17 +171,19 @@ function PlaylistDrawer(props: PlaylistDrawerProps) {
 		<Drawer
 			sx={{
 				"& .MuiDrawer-paper": {
-					width: `${drawerWidth}%`,
+					width: hideDrawer ? "80vw" : `${drawerWidth}%`,
 					color: "#ccccb5",
 					boxSizing: "border-box",
-					background: "transparent",
+					background: "#1b2028",
 					borderColor: "#4b5975",
 					pt: 2,
 					zIndex: 1000,
 				},
 			}}
-			variant="permanent"
 			anchor="right"
+			open={playlistOpen}
+			variant={hideDrawer ? "temporary" : "permanent"}
+			onClose={handlePlaylistToggle}
 		>
 			<Container css={{ p: 0 }}>
 				<Container css={{ p: "$6 $6 0 $6" }}>

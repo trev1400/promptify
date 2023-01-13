@@ -1,5 +1,4 @@
 import { Configuration, OpenAIApi } from "openai";
-import dotenv from "dotenv";
 import querystring from "querystring";
 import axios from "axios";
 import { nanoid } from "nanoid";
@@ -8,9 +7,6 @@ import express from "express";
 import bodyParser from "body-parser";
 
 const app = express();
-
-// // Set path to .env file
-// dotenv.config({ path: "./.env" });
 
 const SPOTIFY_CLIENT_ID = process.env.SPOTIFY_CLIENT_ID;
 const SPOTIFY_CLIENT_SECRET = process.env.SPOTIFY_CLIENT_SECRET;
@@ -122,9 +118,9 @@ app.get("/api/callback", async (req, res) => {
 				refresh_token,
 				expires_in,
 			});
-			res.redirect(`https://promptify.vercel.app/?${queryParams}`);
+			res.redirect(`${process.env.BASE_URL}?${queryParams}`);
 		} else {
-			res.send("https://promptify.vercel.app/");
+			res.send(process.env.BASE_URL);
 		}
 	} catch (error) {
 		res.send(error);

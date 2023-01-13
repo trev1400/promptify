@@ -1,5 +1,5 @@
 import React, { Fragment, useState } from "react";
-import { Container, Text, Progress } from "@nextui-org/react";
+import { Container, Text, Progress, Button } from "@nextui-org/react";
 import SongsGrid from "./SongsGrid";
 import SortAndFilterCollapse from "./SortAndFilterCollapse";
 import { PromptifySong } from "../spotify-utils";
@@ -12,6 +12,7 @@ interface ResultsSectionProps {
 	playlist: Playlist;
 	songsToPlay: SongsToPlay | null;
 	error: boolean;
+	isMobile: boolean;
 	setSongs: React.Dispatch<React.SetStateAction<PromptifySong[]>>;
 	setPlaylist: React.Dispatch<React.SetStateAction<Playlist>>;
 	setSongsToPlay: React.Dispatch<React.SetStateAction<SongsToPlay | null>>;
@@ -49,6 +50,7 @@ function ResultsSections(props: ResultsSectionProps) {
 		playlist,
 		songsToPlay,
 		error,
+		isMobile,
 		setSongs,
 		setPlaylist,
 		setSongsToPlay,
@@ -63,18 +65,30 @@ function ResultsSections(props: ResultsSectionProps) {
 	const getEmptyResultsSectionText = () => {
 		if (accessToken) {
 			return error ? (
-				<Text h3 css={{ textAlign: "center" }}>
+				<Text
+					h3={!isMobile}
+					h4={isMobile}
+					css={{ textAlign: "center" }}
+				>
 					Error fetching prompt results, OpenAI model may be
 					overloaded. Please try again in a few moments!
 				</Text>
 			) : (
-				<Text h3 css={{ textAlign: "center" }}>
+				<Text
+					h3={!isMobile}
+					h4={isMobile}
+					css={{ textAlign: "center" }}
+				>
 					Generate some songs!
 				</Text>
 			);
 		} else {
 			return (
-				<Text h3 css={{ textAlign: "center" }}>
+				<Text
+					h3={!isMobile}
+					h4={isMobile}
+					css={{ textAlign: "center" }}
+				>
 					Log in with a Spotify Premium account to generate some
 					songs!
 				</Text>
@@ -177,11 +191,16 @@ function ResultsSections(props: ResultsSectionProps) {
 				p: isGenerating || songs.length === 0 ? "$40" : "0 $16",
 				mw: "100%",
 				gap: "$8",
+				"@xsMax": {
+					p: isGenerating || songs.length === 0 ? "$24" : "0 $8",
+				},
 			}}
 		>
 			{isGenerating ? (
 				<Fragment>
-					<Text h3>Promptifying, please be patient...</Text>
+					<Text h3={!isMobile} h4={isMobile}>
+						Promptifying, please be patient...
+					</Text>
 					<Progress
 						indeterminated
 						color="primary"
@@ -195,6 +214,7 @@ function ResultsSections(props: ResultsSectionProps) {
 				<Fragment>
 					<SortAndFilterCollapse
 						sort={sort}
+						isMobile={isMobile}
 						setLyricTypes={setLyricTypes}
 						setReleaseTypes={setReleaseTypes}
 						setLibraryStatuses={setLibraryStatuses}
@@ -208,6 +228,7 @@ function ResultsSections(props: ResultsSectionProps) {
 						setPlaylist={setPlaylist}
 						songsToPlay={songsToPlay}
 						setSongsToPlay={setSongsToPlay}
+						isMobile={isMobile}
 					/>
 				</Fragment>
 			)}

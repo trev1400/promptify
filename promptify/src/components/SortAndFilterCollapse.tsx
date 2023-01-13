@@ -4,6 +4,7 @@ import { Sort, ReleaseType, LyricType, LibraryStatus } from "./ResultsSections";
 
 interface SortAndFilterCollapseProps {
 	sort: string;
+	isMobile: boolean;
 	setReleaseTypes: React.Dispatch<React.SetStateAction<Set<string>>>;
 	setLyricTypes: React.Dispatch<React.SetStateAction<Set<string>>>;
 	setLibraryStatuses: React.Dispatch<React.SetStateAction<Set<string>>>;
@@ -17,6 +18,7 @@ interface SortAndFilterCollapseProps {
 function SortAndFilterCollapse(props: SortAndFilterCollapseProps) {
 	const {
 		sort,
+		isMobile,
 		setReleaseTypes,
 		setLyricTypes,
 		setLibraryStatuses,
@@ -63,11 +65,26 @@ function SortAndFilterCollapse(props: SortAndFilterCollapseProps) {
 					w: expanded ? "100%" : "25%",
 					background: "$accents0",
 					m: "0 $12",
+					"&>div:first-child": {
+						p: "$6 0",
+					},
+					"@mdMax": {
+						w: expanded ? "100%" : "35%",
+					},
+					"@smMax": {
+						w: expanded ? "100%" : "50%",
+					},
+					"@xsMax": {
+						m: 0,
+						p: "0 $8",
+					},
 				}}
-				className="filter-collapse"
+				className={
+					isMobile ? "filter-collapse-mobile" : "filter-collapse"
+				}
 			>
-				<Grid.Container gap={2}>
-					<Grid xs={12} sm={6} md={3}>
+				<Grid.Container gap={2} css={{ p: 0 }}>
+					<Grid xs={6} sm={6} md={3}>
 						<Radio.Group
 							label="Sort By"
 							value={sort}
@@ -83,7 +100,7 @@ function SortAndFilterCollapse(props: SortAndFilterCollapseProps) {
 							<Radio value={Sort.Oldest}>Oldest</Radio>
 						</Radio.Group>
 					</Grid>
-					<Grid xs={12} sm={6} md={3}>
+					<Grid xs={6} sm={6} md={3}>
 						<Checkbox.Group
 							label="Release Type"
 							onChange={handleReleaseTypeFilterChange}
@@ -97,7 +114,7 @@ function SortAndFilterCollapse(props: SortAndFilterCollapseProps) {
 							</Checkbox>
 						</Checkbox.Group>
 					</Grid>
-					<Grid xs={12} sm={6} md={3}>
+					<Grid xs={6} sm={6} md={3}>
 						<Checkbox.Group
 							label="Lyric Type"
 							onChange={handleLyricTypeFilterChange}
@@ -108,7 +125,7 @@ function SortAndFilterCollapse(props: SortAndFilterCollapseProps) {
 							<Checkbox value={LyricType.Clean}>Clean</Checkbox>
 						</Checkbox.Group>
 					</Grid>
-					<Grid xs={12} sm={6} md={3}>
+					<Grid xs={6} sm={6} md={3}>
 						<Checkbox.Group
 							label="Library Status"
 							onChange={handleLibraryStatusFilterChange}

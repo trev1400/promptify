@@ -4,7 +4,7 @@
 }
 
 .App {
-  height: 100vh;
+  min-height: 100vh;
 }
 
 .hoverable-icon:hover {
@@ -18,6 +18,18 @@
 
 .filter-collapse span {
   font-size: var(--nextui-fontSizes-md);
+}
+
+.filter-collapse-mobile h3 {
+  font-size: var(--nextui-fontSizes-xs);
+}
+
+.filter-collapse-mobile span {
+  font-size: var(--nextui-fontSizes-xs);
+}
+
+.filter-collapse-mobile label {
+  font-size: var(--nextui-fontSizes-xs)!important;
 }
 
 .PlayerRSWP {

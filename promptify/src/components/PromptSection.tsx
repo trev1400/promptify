@@ -7,6 +7,7 @@ import { accessToken } from "../spotify-utils";
 interface PromptSectionProps {
 	prompt: string;
 	isGenerating: boolean;
+	isMobile: boolean;
 	handlePromptChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
 	handlePromptClear: () => void;
 	fetchCompletions: () => void;
@@ -16,6 +17,7 @@ function PromptSection(props: PromptSectionProps) {
 	const {
 		prompt,
 		isGenerating,
+		isMobile,
 		handlePromptChange,
 		handlePromptClear,
 		fetchCompletions,
@@ -31,6 +33,9 @@ function PromptSection(props: PromptSectionProps) {
 				p: "$12 $20",
 				mw: "100%",
 				rowGap: "$8",
+				"@xsMax": {
+					p: "$6 $8",
+				},
 			}}
 		>
 			<ControlledTextArea
@@ -54,11 +59,14 @@ function PromptSection(props: PromptSectionProps) {
 					gap: "$8",
 					p: 0,
 					m: 0,
+					"@smMax": {
+						maxWidth: "none",
+					},
 				}}
 			>
 				<Button
 					color="error"
-					size="lg"
+					size={isMobile ? "sm" : "md"}
 					iconRight={<FiXCircle size={20} />}
 					disabled={prompt === "" || isGenerating || !accessToken}
 					onPress={handlePromptClear}
@@ -66,7 +74,7 @@ function PromptSection(props: PromptSectionProps) {
 					Clear
 				</Button>
 				<Button
-					size="lg"
+					size={isMobile ? "sm" : "md"}
 					onPress={fetchCompletions}
 					disabled={prompt === "" || isGenerating || !accessToken}
 				>

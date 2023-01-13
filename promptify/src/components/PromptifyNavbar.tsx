@@ -9,14 +9,19 @@ import {
 } from "@nextui-org/react";
 import { FiInfo } from "react-icons/fi";
 import { logout } from "../spotify-utils";
-import { urlWithProxy, drawerWidth } from "../App";
+import { urlWithProxy, drawerWidth, muiTheme } from "../App";
+import { useMediaQuery } from "@mui/material";
 
 interface PromptifyNavbarProps {
 	spotifyToken: string | null;
+	isMobile: boolean;
+	handlePlaylistToggle: () => void;
 }
 
 function PromptifyNavbar(props: PromptifyNavbarProps) {
-	const { spotifyToken } = props;
+	const { spotifyToken, isMobile, handlePlaylistToggle } = props;
+	const hideDrawer: boolean = useMediaQuery(muiTheme.breakpoints.down("md"));
+
 	return (
 		<Navbar
 			variant="static"
@@ -26,6 +31,9 @@ function PromptifyNavbar(props: PromptifyNavbarProps) {
 				width: `calc(100vw - ${drawerWidth}%)`,
 				background: "$background",
 				px: "$6",
+				"@smMax": {
+					width: "100vw",
+				},
 			}}
 		>
 			<Navbar.Brand css={{ d: "flex", ai: "center", gap: "$4" }}>
@@ -51,7 +59,15 @@ function PromptifyNavbar(props: PromptifyNavbarProps) {
 							</div>
 						</Popover.Trigger>
 						<Popover.Content css={{ p: "$8" }}>
-							<Container css={{ maxWidth: "35vw" }}>
+							<Container
+								css={{
+									maxWidth: "35vw",
+									"@xsMax": {
+										maxWidth: "75vw",
+										fontSize: "$sm",
+									},
+								}}
+							>
 								Promptify was built as a capstone project for
 								Brown University's CSCI 1300: User Interfaces
 								and User Experience. It uses OpenAI's GPT-3 API
@@ -66,14 +82,28 @@ function PromptifyNavbar(props: PromptifyNavbarProps) {
 						</Popover.Content>
 					</Popover>
 				</Navbar.Link>
+				{hideDrawer && (
+					<Navbar.Item
+						variant="underline"
+						onClick={() => handlePlaylistToggle()}
+					>
+						Playlist
+					</Navbar.Item>
+				)}
 				<Navbar.Item>
 					{!spotifyToken ? (
 						<a href={`${urlWithProxy}/login`}>
-							<Button auto>Log In</Button>
+							<Button auto size={isMobile ? "sm" : "md"}>
+								Log In
+							</Button>
 						</a>
 					) : (
 						<>
-							<Button auto onClick={logout}>
+							<Button
+								auto
+								size={isMobile ? "sm" : "md"}
+								onClick={logout}
+							>
 								Log Out
 							</Button>
 						</>
