@@ -23,6 +23,7 @@ Promptify, these items are songs, which can be filtered and sorted by various pr
 and “aggregated” into a playlist. However, Playlist Pal’s complexity and design was quite
 simple — primarily because it used a hardcoded JSON file of songs and had limited
 interactivity.
+
 To incorporate “substantial development” into the extension of Playlist Pal, I came
 up with the idea for Promptify, which adds a nuance to the existing playlist creation
 functionality by allowing users to input a prompt or description of a specific vibe, scenario,
@@ -37,6 +38,7 @@ and the Spotify API’s search endpoint doesn’t always return the desired song
 well-formatted query (e.g. returning a remix of The Weeknd’s Blinding Lights rather than
 the song itself). In addition, users may occasionally not receive results if OpenAI’s servers
 are overloaded with too many requests.
+
 The remainder of my work came on the design side. Since this assignment was for
 UI/UX, it was expected that I adhere to good usability and accessibility principles. I
 focused on creating a strong visual hierarchy betwen the app’s different sections,
